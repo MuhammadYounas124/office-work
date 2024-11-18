@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "../public/dist/css/adminlte.min.css";
 
 function JsonAttribute() {
   const [datatype, setDatatype] = useState("");//use are use for to initalize the component 
@@ -9,34 +9,46 @@ function JsonAttribute() {
     fieldName: "",
     defaultValue: "",
     description: "",
-    isRequired: false,
+    isRequired: false, // props element defined is required to be passed from parent component.
     isNullable: false,
     startValue: "",
     endValue: "",
     maxLength: "",
   });
 
-  // General handler for all inputs (checkbox and others)
-  const handleInputChange = (e) => {   // e stands for the event object that is
-    // automatically passed to the event handler when an event occurs
-   // e.target refers to the DOM element that triggered the event. In this case, 
-   //it will be the input element (like a text field, checkbox, or select dropdown).
-    const inputName = e.target.name; // This line stores the name of the field being changed into the inputName variable.
-    let inputValue = e.target.value; // This line stores the value of the field being changed into the inputvalue variable.
+   
 
-    // Explicit handling for checkboxes
-    if (e.target.type === "checkbox") {
-      inputValue = e.target.checked; // Checkbox state is already a boolean
-    }
+// General handler for all inputs (checkbox and others)
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {   // e stands for the event object that is
+      // automatically passed to the event handler when an event occurs
+
+ 
+     //it will be the input element (like a text field, checkbox. But we will handle checkbox seperatly because it require boolean).
+    const inputName = e.target.name; // Field name // // This line stores the name as string 
+    const inputValue = e.target.value; // Default value for text inputs // This line stores the value as string 
+    
     setFormData({
-      ...formData, // The ...formData part is called the spread operator.
-      [inputName]: inputValue,  // Dynamically update specific form data field
+      ...formData, // Preserve other form fields //The ...formData part is called the spread operator.
+      [inputName]: inputValue, // Update the specific field // Dynamically update specific form data field
     });
-  }
+  };
 
+  
+  const handleCheckbox = () => {
+    setFormData({
+      ...formData,
+      isRequired : !formData.isRequired     // ! means not, so when isRequired is true, it will convert it to false & when false, convert to true 
+    });
+  };
+
+  
   // Handle datatype dropdown
-  const handleDatatypeSelection = (e) => {
-    setDatatype(e.target.value); // Set selected datatype
+  const handleDatatypeSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedDatatype = e.target.value;
+    setDatatype(selectedDatatype);
+    
+    // Set selected datatype
 
     // Reset specific fields when datatype changes
     setFormData({
@@ -64,13 +76,20 @@ const handleSave = () => {
   }
 
   // Add validation for datatype-specific fields
-  if (datatype === "int" && (!formData.startValue || !formData.endValue)) {
-    // Validate that start and end values are provided for 'int' datatype
+  if (datatype === "int" && (!formData.startValue || !formData.endValue)) { // (||) to define default values for variable props
+    // to define conditional rendering // To handle missing or undefined data gracefully // To prevent runtime errors 
+    //when accessing nested data.
+    // Validate that start and end values are provided for 'int' datatype.
+
+   // &&: Executes the second expression only if the first one is true.
+   // ||: Executes the second expression if the first one is false.
+
     alert("Please fill in the start and end values for integer datatype.");
     return; // Stop further execution if start and end values are not provided
   }
 
-  if (datatype === "String" && !formData.maxLength) {
+  if (datatype === "String" && !formData.maxLength) { // To conditionally render components without writing if-else statements.
+    //To check multiple conditions before rendering.// To make your code concise and readable for simple conditional logic.
     // Validate that maxLength is provided for 'String' datatype
     alert("Please fill in the max length for string datatype.");
     return; // Stop further execution if maxLength is not provided
@@ -135,7 +154,7 @@ const handleSave = () => {
                 type="checkbox"
                 className="form-check-input"
                 name="isRequired"
-                onChange={handleInputChange}
+                onChange={handleCheckbox}
                 checked={formData.isRequired}
               />
               <label className="form-check-label">Required</label>
@@ -146,7 +165,7 @@ const handleSave = () => {
                 type="checkbox"
                 className="form-check-input"
                 name="isNullable"
-                onChange={handleInputChange}
+                onChange={handleCheckbox}
                 checked={formData.isNullable}
               />
               <label className="form-check-label">Nullable</label>
@@ -187,7 +206,7 @@ const handleSave = () => {
                     className="form-control"
                     name="endValue"
                     value={formData.endValue}
-                    onChange={handleInputChange}
+                      onChange={handleInputChange}
                   />
                 </div>
               </>
