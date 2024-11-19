@@ -19,30 +19,29 @@ function JsonAttribute() {
    
 
 // General handler for all inputs (checkbox and others)
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {   // e stands for the event object that is
+  const handleInputChange = ( e: React.ChangeEvent<HTMLInputElement >) => {   // e stands for the event object that is
       // automatically passed to the event handler when an event occurs
-
- 
      //it will be the input element (like a text field, checkbox. But we will handle checkbox seperatly because it require boolean).
-    const inputName = e.target.name; // Field name // // This line stores the name as string 
-    const inputValue = e.target.value; // Default value for text inputs // This line stores the value as string 
     
-    setFormData({
-      ...formData, // Preserve other form fields //The ...formData part is called the spread operator.
-      [inputName]: inputValue, // Update the specific field // Dynamically update specific form data field
-    });
+     if (e.target.type === "checkbox") {
+      if (e.target.name === "isRequired") {
+        setFormData({
+          ...formData,
+          isRequired: e.target.checked, // Update `isRequired` field
+        });
+      } else if (e.target.name === "isNullable") {
+        setFormData({
+          ...formData,
+          isNullable: e.target.checked, // Update `isNullable` field
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value, // Update other input fields
+      });
+    }
   };
-
-  
-  const handleCheckbox = () => {
-    setFormData({
-      ...formData,
-      isRequired : !formData.isRequired     // ! means not, so when isRequired is true, it will convert it to false & when false, convert to true 
-    });
-  };
-
-  
   // Handle datatype dropdown
   const handleDatatypeSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedDatatype = e.target.value;
@@ -154,7 +153,7 @@ const handleSave = () => {
                 type="checkbox"
                 className="form-check-input"
                 name="isRequired"
-                onChange={handleCheckbox}
+                onChange={handleInputChange}
                 checked={formData.isRequired}
               />
               <label className="form-check-label">Required</label>
@@ -165,7 +164,7 @@ const handleSave = () => {
                 type="checkbox"
                 className="form-check-input"
                 name="isNullable"
-                onChange={handleCheckbox}
+                onChange={handleInputChange}
                 checked={formData.isNullable}
               />
               <label className="form-check-label">Nullable</label>
